@@ -11,4 +11,6 @@ LABEL "homepage"="https://github.com/Benbentwo/increment-semver"
 ADD entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 
+USER 1000
+
 ENTRYPOINT ["/entrypoint.sh"]
