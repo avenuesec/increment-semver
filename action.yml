@@ -1,20 +1,25 @@
 # action.yml
-name: 'Increment Semver'
-description: 'Get the next version of a github repository'
+name: "Increment Semver"
+description: "Get the next version of a github repository"
 branding:
-  icon: 'git-commit'
-  color: 'gray-dark'
+  icon: "git-commit"
+  color: "gray-dark"
 author: Benbentwo
 inputs:
-  version-level:  # id of input
-    description: 'Version Level to update [-Mmp]'
+  version-level: # id of input
+    description: "Version Level to update [-Mmp]"
     required: true
-    default: '-p'
+    default: "-p"
+  tagDir:
+    description: "Directory from tags"
+    required: false
+    default: ""
 outputs:
   version: # id of output
-    description: 'The incremented version'
+    description: "The incremented version"
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: "docker"
+  image: "Dockerfile"
   args:
     - ${{ inputs.version-level }}
+    - ${{ inputs.tagDir }}

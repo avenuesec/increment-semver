@@ -4,24 +4,31 @@
 
 # Parse command line options.
 
-while getopts ":Mmp" Option
-do
-  case $Option in
-    M ) major=true;;
-    m ) minor=true;;
-    p ) patch=true;;
-  esac
-done
+if [ -z "$1" ]
+  then
+    echo "usage: $(basename $0) [-Mmp] major.minor.patch"
+    exit 1
+  else
+    case $1 in
+      M ) major=true;;
+      m ) minor=true;;
+      p ) patch=true;;
+    esac
+fi
+
+if [ ! -z "$2" ]
+  then
+    dir=$2
+fi
 
 shift $(($OPTIND - 1))
 
-#version=$1
 git config --global --add safe.directory /github/workspace
 echo "cd to github workspace"
 cd ${GITHUB_WORKSPACE}
-git for-each-ref refs/tags/ --count=1 --sort=-version:refname --format='%(refname:short)'
+git for-each-ref refs/tags/${dir} --count=1 --sort=-version:refname --format='%(refname:short)'
 
-version=$(git for-each-ref refs/tags/ --count=1 --sort=-version:refname --format='%(refname:short)')
+version=$(git for-each-ref refs/tags/${dir} --count=1 --sort=-version:refname --format='%(refname:short)')
 echo "Version: ${version}"
 
 if [ -z ${version} ]
@@ -46,7 +53,7 @@ fi
 if [ ! -z $major ]
 then
 # Check for v in version (e.g. v1.0 not just 1.0)
-  if [[ ${a[0]} =~ ([vV]?)([0-9]+) ]]
+  if [[ ${a[0]} =~ ([${dir}vV]?)([0-9]+) ]]
   then 
     v="${BASH_REMATCH[1]}"
     major_version=${BASH_REMATCH[2]}
@@ -77,4 +84,3 @@ version=$(echo "${a[0]}.${a[1]}.${a[2]}")
 just_numbers=$(echo "${major_version}.${a[1]}.${a[2]}")
 echo "::set-output name=version::${version}"
 echo "::set-output name=stripped-version::${just_numbers}"
-
