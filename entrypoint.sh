@@ -4,24 +4,20 @@
 
 # Parse command line options.
 
-if [ -z "$1" ]
-  then
-    echo "usage: $(basename $0) [-Mmp] major.minor.patch"
-    exit 1
-  else
-    case $1 in
-      M ) major=true;;
-      m ) minor=true;;
-      p ) patch=true;;
+while getopts ":Mmp" opt; do
+    case $opt in
+        M ) major=true;;
+        m ) minor=true;;
+        p ) patch=true;;
     esac
-fi
+done
+shift $((OPTIND -1))
 
-if [ ! -z "$2" ]
+
+if [ ! -z "$1" ]
   then
-    dir=$2
+    dir=$1
 fi
-
-shift $(($OPTIND - 1))
 
 git config --global --add safe.directory /github/workspace
 echo "cd to github workspace"
