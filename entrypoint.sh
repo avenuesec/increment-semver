@@ -47,6 +47,11 @@ then
 fi
 # Build array from version string.
 
+if [ ! -z ${suffix} ]
+  then
+    version=${version%"-$suffix"}
+fi
+
 a=( ${version//./ } )
 major_version=0
 # If version string is missing or has the wrong number of members, show usage message.
