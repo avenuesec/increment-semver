@@ -4,33 +4,46 @@
 
 # Parse command line options.
 
-while getopts ":Mmp" opt; do
+while getopts ":Mmp d:s:" opt; do
     case $opt in
         M ) major=true;;
         m ) minor=true;;
         p ) patch=true;;
+        d ) dir=$OPTARG;;
+        s ) suffix=$OPTARG;;
     esac
 done
-shift $((OPTIND -1))
 
+filter="refs/tags"
 
-if [ ! -z "$1" ]
+if [ ! -z ${dir} ]
   then
-    dir=$1
+    filter="${filter}/${dir}"
 fi
+
+if [ ! -z ${suffix} ]
+  then
+    filter="${filter}/*-${suffix}"
+fi
+
+shift $((OPTIND -1))
 
 git config --global --add safe.directory /github/workspace
 echo "cd to github workspace"
 cd ${GITHUB_WORKSPACE}
-git for-each-ref refs/tags/${dir} --count=1 --sort=-version:refname --format='%(refname:short)'
-
-version=$(git for-each-ref refs/tags/${dir} --count=1 --sort=-version:refname --format='%(refname:short)')
+git for-each-ref ${filter} --count=1 --sort=-version:refname --format='%(refname:short)'
+version=$(git for-each-ref ${filter} --count=1 --sort=-version:refname --format='%(refname:short)')
 echo "Version: ${version}"
 
 if [ -z ${version} ]
 then
-    echo "Couldn't determine version"
-    exit 1
+  echo "No version found, setting to 0.0.0"
+  version="v0.0.0"
+
+  if [ ! -z ${dir} ]
+  then
+    version="${dir}/${version}"
+  fi
 fi
 # Build array from version string.
 
@@ -75,8 +88,12 @@ then
   ((a[2]++))
 fi
 
-echo "${a[0]}.${a[1]}.${a[2]}"
-version=$(echo "${a[0]}.${a[1]}.${a[2]}")
-just_numbers=$(echo "${major_version}.${a[1]}.${a[2]}")
+finalver="${a[0]}.${a[1]}.${a[2]}"
+if [ ! -z ${suffix} ]
+  then
+    finalver="${finalver}-${suffix}"
+fi
+
+echo $finalver
+version=$(echo "${finalver}")
 echo "::set-output name=version::${version}"
-echo "::set-output name=stripped-version::${just_numbers}"
