@@ -26,5 +26,5 @@ runs:
   image: "Dockerfile"
   args:
     - ${{ inputs.version-level }}
-    - -d ${{ inputs.tagDir }}
-    - -s ${{ inputs.suffix }}
+    - -d${{ inputs.tagDir }}
+    - -s${{ inputs.suffix }}
