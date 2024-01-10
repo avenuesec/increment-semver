@@ -50,6 +50,7 @@ fi
 if [ ! -z ${suffix} ]
   then
     version=${version%"-$suffix"}
+    version=`echo $texto | sed 's#/#\-#g'`
 fi
 
 a=( ${version//./ } )
