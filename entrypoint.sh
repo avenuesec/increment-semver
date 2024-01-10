@@ -23,6 +23,7 @@ fi
 
 if [ ! -z ${suffix} ]
   then
+    suffix=`echo $suffix | sed 's#/#\-#g'`
     filter="${filter}/*-${suffix}"
 fi
 
@@ -50,7 +51,6 @@ fi
 if [ ! -z ${suffix} ]
   then
     version=${version%"-$suffix"}
-    version=`echo $texto | sed 's#/#\-#g'`
 fi
 
 a=( ${version//./ } )
